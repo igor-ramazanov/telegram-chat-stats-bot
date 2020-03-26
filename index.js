@@ -2,6 +2,8 @@ const Telegraf = require("telegraf");
 const { saveStats, loadStats } = require("./persist-stats")
 const { getTimestampLocally : getDay } = require("./get-timestamp")
 const getHeader = require("./get-header");
+const { getAverageMessagesAtDay } = require("./src/get-average-messages-at-day");
+const moment = require("moment-timezone");
 
 let stats = {};
 
@@ -22,7 +24,29 @@ let countMessage = (chatId, userId) => {
     console.log(`Counted message from ${userId} in chat ${chatId}`);
 }
 
+let userRepeats = {};
 let onMessage = ctx => {
+    if (parseInt(ctx.message.chat.id) > 0) {
+        if (!userRepeats[ctx.message.chat.id]) {
+            userRepeats[ctx.message.chat.id] = 0;
+        }
+        let repeats = {
+            "4": "Хорош",
+            "5": "Хорош, говорю",
+            "6": "Сука, заебал!!1",
+            "7": "Игнорю..."
+        };
+
+        userRepeats[ctx.message.chat.id] += 1;
+        if (userRepeats[ctx.message.chat.id] <= 3) {
+            return ctx.reply("Добавляй меня в свою конфу, и каждый день в 24:00 я буду присылать туда статистику сообщений за сегодняшний день.")
+        } else {
+            if (repeats[userRepeats[ctx.message.chat.id]]) {
+                return ctx.reply(repeats[userRepeats[ctx.message.chat.id]]);
+            }
+            return;       
+        }
+    }
 
     if (ctx.message.is_bot) {
         return;
@@ -30,6 +54,7 @@ let onMessage = ctx => {
 
     if (ctx.message.left_chat_participant || ctx.message.left_chat_member) {
         return;
+        
     }
 
     if (ctx.message.new_chat_member || ctx.message.new_chat_members || ctx.message.new_chat_participant) {
@@ -41,13 +66,14 @@ let onMessage = ctx => {
         ? username 
         : `${first_name || ""} ${last_name || ""}`);
     let chatId = "" + ctx.message.chat.id;
-    
     countMessage(chatId, userId.trim())
 }
 
 
 // notifies users and resets stats object
 let sendAll = bot => {
+
+    let averages = getAverageMessagesAtDay(moment().day());
 
     Object.keys(stats).forEach(chatId => {
         let chatStats = stats[chatId];
@@ -61,7 +87,9 @@ let sendAll = bot => {
             return `${name}: ${count}`
         }).join("\n");
 
-        let header = getHeader(total);
+        
+
+        let header = getHeader(total, averages[chatId]);
 
         bot.telegram.sendMessage(parseInt(chatId), header + "\n" + text);
 
