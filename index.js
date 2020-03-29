@@ -72,8 +72,8 @@ let onMessage = ctx => {
 
 // notifies users and resets stats object
 let sendAll = bot => {
-
-    let averages = getAverageMessagesAtDay(moment().subtract(1, "days").day());
+    let day = moment().subtract(1, "days").day();
+    let averages = getAverageMessagesAtDay(day);
 
     Object.keys(stats).forEach(chatId => {
         let chatStats = stats[chatId];
@@ -89,7 +89,7 @@ let sendAll = bot => {
 
         
 
-        let header = getHeader(total, averages[chatId]);
+        let header = getHeader(total, averages[chatId], day);
 
         bot.telegram.sendMessage(parseInt(chatId), header + "\n" + text);
 

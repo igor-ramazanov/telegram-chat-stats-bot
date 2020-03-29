@@ -15,6 +15,7 @@
     "cron": "^1.7.1",
     "make-dir": "^3.0.0",
     "moment-timezone": "^0.5.26",
+    "pluralize-ru": "^1.0.1",
     "telegraf": "^3.32.0"
   },
   "devDependencies": {

@@ -1,12 +1,24 @@
+let pluralize = require("pluralize-ru");
+
 let getRand = (source, total) => {
     return source[Math.floor(source.length * Math.random())].replace("%", total)
 }
 
-module.exports = function getHeader(total, average) {
+let days = [
+    "воскресенья",
+    "понедельника",
+    "вторника",
+    "среды",
+    "четверга",
+    "пятницы",
+    "субботы"
+];
+
+module.exports = function getHeader(total, average, day) {
     
+    let messageWord = pluralize(total, "сообщений", "сообщение", "сообщения", "сообщений" )
 
-
-    let mainMessage = `За сегодня уважаемые участники этого чата написали ${total} сообщений`;
+    let mainMessage = `За сегодня уважаемые участники этого чата написали ${total} ${messageWord}`;
     
     let index = typeof average === 'number' && average > 0
         ? total / average
@@ -14,11 +26,11 @@ module.exports = function getHeader(total, average) {
     
     let indexMessage = index === null
         ? null
-        : `Индекс базара составил ${Math.round(index * 100) / 100}`;
+        : `и наговорили на ${Math.round(index * 100)}% от среднего ${days[day]}`;
     
     let overall = [mainMessage, indexMessage]
         .filter(a => typeof a === 'string' && a.length > 0)
-        .join("\n");
+        .join(" ");
     
     return overall;
 
