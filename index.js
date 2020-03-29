@@ -72,7 +72,7 @@ let onMessage = ctx => {
 
 // notifies users and resets stats object
 let sendAll = bot => {
-    let day = moment().subtract(1, "days").day();
+    let day = moment().subtract(2, "hour").day();
     let averages = getAverageMessagesAtDay(day);
 
     Object.keys(stats).forEach(chatId => {

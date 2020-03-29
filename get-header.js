@@ -5,13 +5,13 @@ let getRand = (source, total) => {
 }
 
 let days = [
-    "воскресенья",
-    "понедельника",
-    "вторника",
-    "среды",
-    "четверга",
-    "пятницы",
-    "субботы"
+    "среднего воскресенья",
+    "среднего понедельника",
+    "среднего вторника",
+    "средней среды",
+    "среднего четверга",
+    "средней пятницы",
+    "средней субботы"
 ];
 
 module.exports = function getHeader(total, average, day) {
@@ -26,7 +26,7 @@ module.exports = function getHeader(total, average, day) {
     
     let indexMessage = index === null
         ? null
-        : `и наговорили на ${Math.round(index * 100)}% от среднего ${days[day]}`;
+        : `и наговорили на ${Math.round(index * 100)}% от ${days[day]}`;
     
     let overall = [mainMessage, indexMessage]
         .filter(a => typeof a === 'string' && a.length > 0)
