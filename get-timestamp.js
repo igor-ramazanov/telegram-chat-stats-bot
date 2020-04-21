@@ -16,7 +16,7 @@ let getTimestampFromWorldAPI = async () => {
 }
 
 let getTimestampLocally = async () => {
-    let now = moment(new Date());
+    let now = moment();
     return Promise.resolve(now.tz("Europe/Moscow").day());
 }
 
