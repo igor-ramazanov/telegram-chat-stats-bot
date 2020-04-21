@@ -8,15 +8,17 @@ let loadStats = () => {
         const parsed = JSON.parse(stats);
         return parsed;
     } catch (e) {
+        console.log("Can't load stats");
         return {};
     }
 
 }
 
-let saveStats = stats => {
+let saveStats = (stats, path) => {
+    path = path || "stats/current.json";
     try {
         mkdir("stats/")
-        fs.writeFileSync("stats/current.json", JSON.stringify(stats, null, 3));
+        fs.writeFileSync(path, JSON.stringify(stats, null, 3));
     } catch (e) {
         console.log(`Unable to save stats: ${e}`)
     }

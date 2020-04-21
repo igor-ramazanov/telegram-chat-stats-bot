@@ -67,6 +67,13 @@ let sendAll = bot => {
 
     });
 
+    let date = [
+        new Date().getDate(),
+        new Date().getMonth() + 1,
+        new Date().getFullYear()
+    ].join("-");
+
+    saveStats(stats, `stats/${date}.json`);
     stats = {};
     saveStats(stats);
 
@@ -79,6 +86,8 @@ let start = async () => {
 
 
     stats = loadStats();
+    console.log(`Loaded stats:\n` + JSON.stringify(stats, null, 3));
+
     bot.on("message", onMessage)
     let lastTimeStamp = await getDay();
 
@@ -102,7 +111,8 @@ let start = async () => {
     }, 1000 * 15); // every 15 seconds 
 
 
-    bot.startPolling()
+    bot.startPolling();
+    console.log("Started polling")
 };
 
 start();
