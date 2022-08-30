@@ -14,7 +14,7 @@
     "axios": "^0.19.0",
     "cron": "^1.7.1",
     "make-dir": "^3.0.0",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "pluralize-ru": "^1.0.1",
     "telegraf": "^3.32.0"
   },
