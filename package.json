@@ -1,24 +1,33 @@
 {
-  "name": "tg-chat-stats",
+  "name": "telegram-chat-stats-bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start:dev": "nodemon --ignore stats .",
-    "start": "node ."
+    "dev": "nodemon --no-deprecation --ignore stats .",
+    "start": "node --no-deprecation .",
+    "docker:build": "docker image build . -t flerokoo/telegram-chat-stats-bot",
+    "docker:push": "docker push flerokoo/telegram-chat-stats-bot"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Emile Shodiev",
+    "email": "kaizzzer@gmail.com",
+    "url": "https://shodiev.ru"
+  },
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.0",
-    "cron": "^1.7.1",
-    "make-dir": "^3.0.0",
-    "moment-timezone": "^0.5.26",
-    "pluralize-ru": "^1.0.1",
-    "telegraf": "^3.32.0"
+    "better-sqlite3": "9.4.0",
+    "dotenv": "16.4.1",
+    "nodemon": "3.0.3",
+    "pluralize-ru": "1.0.1",
+    "telegraf": "4.15.3"
   },
   "devDependencies": {
-    "nodemon": "^1.19.1"
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "nodemon": "3.0.3",
+    "prettier": "^3.2.5"
   }
 }

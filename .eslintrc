@@ -1,0 +1,16 @@
+{
+  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
+  "plugins": ["prettier"],
+  "env": { "node": true },
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "prettier/prettier": ["error"],
+    "no-console": "off",
+    "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
+    "no-continue": "off",
+    "no-unused-vars":"off",
+    "no-plusplus": "off"
+  },
+}
