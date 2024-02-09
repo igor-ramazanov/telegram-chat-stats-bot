@@ -1,7 +1,10 @@
 const path = require("path");
 const fs = require("fs");
 const { db } = require("../src/db/db");
-const { toDateString } = require("../src/utils/utils");
+const dayjs = require("dayjs");
+const { config } = require("../src/config");
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/timezone"));
 
 const FAKE_USER_ID = 0;
 
@@ -14,12 +17,18 @@ const isJson = (path) => path.endsWith(".json");
 
 const parseDate = (t) => {
   const m = t.match(/([\d]+)-([\d]+)-([\d]+)/);
-  return new Date(Date.UTC(parseInt(m[3]), parseInt(m[2]) - 1, parseInt(m[1])));
+  return dayjs
+    .utc()
+    .tz(config.timezone)
+    .set("day", parseInt(m[1]))
+    .set("month", parseInt(m[2]) - 1)
+    .set("year", parseInt(m[3]))
+    .startOf("day");
 };
 
 const statement = db.prepare(`
-  INSERT INTO MessageCount (date, isoDate, chatId, userId, messageCount)
-  VALUES (:date, :isoDate, :chatId, :userId, :messages)
+  INSERT INTO MessageCount (timestamp, chatId, userId, messageCount)
+  VALUES (:timestamp, :chatId, :userId, :messages)
   ON CONFLICT DO NOTHING
 `);
 
@@ -35,6 +44,7 @@ const migrate = (rootPath = "stats") => {
     try {
       const date = parseDate(file);
       if (!date) continue;
+      const timestamp = date.unix();
 
       const content = JSON.parse(fs.readFileSync(file, "utf-8"));
       for (let chatId of Object.keys(content)) {
@@ -43,11 +53,10 @@ const migrate = (rootPath = "stats") => {
         statement.run({
           chatId,
           userId: FAKE_USER_ID,
-          date: toDateString(date),
-          isoDate: date.toISOString(),
+          timestamp,
           messages,
         });
-        console.log("migrated file", { file, date, messages });
+        console.log("migrated file", { file, timestamp, messages });
       }
       fs.writeFileSync(file + ".migrated", "");
     } catch (err) {

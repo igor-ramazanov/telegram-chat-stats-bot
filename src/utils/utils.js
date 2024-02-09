@@ -1,32 +1,31 @@
 const path = require("path");
 const fs = require("fs");
-
+const dayjs = require("dayjs");
 const isProduction = () => process.env.NODE_ENV === "production";
 
-const getToday = () => {
-  const today = new Date();
-  today.setUTCHours(12);
-  today.setUTCMilliseconds(0);
-  today.setUTCMinutes(0);
-  today.setUTCSeconds(0);
-  return today;
-};
+const getTodayTimestamp = () => dayjs.utc().startOf("day").unix();
 
-const getYesterday = () => {
-  const y = getToday();
-  y.setDate(y.getDate() - 1);
-  return y;
-};
+const getYesterdayTimestamp = () => dayjs.utc().startOf("day").subtract(1, "day").unix();
 
 const loadAll = (rootPath) => {
-  const out = [];
-  fs.readdirSync(rootPath).forEach((file) => {
-    if (!file.endsWith(".js")) return;
-    // eslint-disable-next-line import/no-dynamic-require, global-require
-    require(path.join(rootPath, file));
-    out.push(file);
-  });
-  return out;
+  return fs
+    .readdirSync(rootPath)
+    .filter((file) => file.endsWith(".js"))
+    .map((file) => {
+      require(path.join(rootPath, file));
+      return file;
+    });
+};
+
+const loadAllRecursive = (rootPath, predicate) => {
+  predicate ??= () => true;
+  return fs
+    .readdirSync(rootPath, { recursive: true })
+    .filter(predicate)
+    .map((file) => {
+      require(path.join(rootPath, file));
+      return file;
+    });
 };
 
 const toDateString = (date, noYear = false) => {
@@ -48,9 +47,10 @@ const WEEKS = DAYS / 7;
 
 module.exports = {
   isProduction,
-  getToday,
-  getYesterday,
+  getTodayTimestamp,
+  getYesterdayTimestamp,
   loadAll,
+  loadAllRecursive,
   toDateString,
   fromDateString,
   SEC,

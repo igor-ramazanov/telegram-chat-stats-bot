@@ -8,4 +8,4 @@ fs.mkdirSync(path.dirname(config.db), { recursive: true });
 const db = driver(config.db);
 db.exec(readFileSync("./sql/install.sql", "utf-8"));
 
-module.exports = { db };
+module.exports = { db }; 

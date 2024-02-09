@@ -1,16 +1,23 @@
 const { bot } = require("./bot/bot");
+const { loadAll, loadAllRecursive } = require("./utils/utils");
+const dayjs = require("dayjs");
+dayjs.extend(require("dayjs/plugin/utc"));
+dayjs.extend(require("dayjs/plugin/timezone"));
 const scheduler = require("./utils/scheduler");
-const { loadAll } = require("./utils/utils");
+const path = require("path");
+const { config } = require("./config");
 require("dotenv").config();
 
 const loadJobs = () => {
-  const jobs = loadAll(`${__dirname}/jobs/`);
-  console.log(`loaded jobs: ${jobs.join(", ")}`);
+  const jobs = loadAllRecursive(`${__dirname}/jobs/`, (_) => _.endsWith(".job.js"));
+  console.log(`loaded routes:\n${jobs.map((_) => `* ${path.basename(_)}`).join("\n")}`);
 };
 
 const loadTelegramRoutes = () => {
-  const routes = loadAll(`${__dirname}/bot/routes`);
-  console.log(`loaded bot routes: ${routes.join(", ")}`);
+  const routes = loadAllRecursive(`${__dirname}/bot/routes/`, (_) =>
+    _.endsWith(".route.js"),
+  );
+  console.log(`loaded jobs:\n${routes.map((_) => `* ${path.basename(_)}`).join("\n")}`);
 };
 
 const startup = async () => {

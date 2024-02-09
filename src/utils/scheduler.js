@@ -1,3 +1,6 @@
+const { config } = require("../config");
+const dayjs = require("dayjs");
+
 const callbacks = {
   second: [],
   minute: [],
@@ -8,15 +11,11 @@ const callbacks = {
 };
 
 const getState = () => {
-  const date = new Date();
-  return {
-    second: date.getUTCSeconds(),
-    minute: date.getUTCMinutes(),
-    hour: date.getUTCHours(),
-    day: date.getUTCDate(),
-    month: date.getUTCMonth(),
-    year: date.getUTCFullYear(),
-  };
+  const date = dayjs.utc().tz(config.timezone);
+  return Object.keys(callbacks).reduce((acc, key) => {
+    acc[key] = date.get(key);
+    return acc;
+  }, {});
 };
 
 let prevState = getState();
