@@ -12,6 +12,8 @@ const statement = db.prepare(`
 
 bot.command("drs", async (ctx) => {
   let list = await transformUserIdsToUserObjects(statement.all(ctx.chat.id));
+  if (list.length === 0) return await ctx.reply("Нет сохраненных дней рождения");
+  console.log(list);
   list.forEach((_) => (_.date = dayjs(_.date, "MM-DD")));
   list = list.sort((a, b) => (a.date.isAfter(b.date) ? 1 : -1));
   list.forEach((_) => (_.date = _.date.format("DD MMMM")));

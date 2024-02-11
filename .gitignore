@@ -108,5 +108,6 @@ typings/
 /stats
 /test.js
 /volume
+/data
 .DS_Store
 ids.json
