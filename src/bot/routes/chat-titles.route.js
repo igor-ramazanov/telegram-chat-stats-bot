@@ -33,4 +33,5 @@ bot.command("titles", (ctx, next) => {
   const msg = ['История названий чата:']
   msg.push(...data.map(_ => `${_.timestamp} ${_.title}`))
   ctx.reply(msg.join("\n"))
+  next();
 });
