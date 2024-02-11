@@ -4,15 +4,11 @@ const { DAYS } = require("./utils");
 
 const userCache = cache({ maxValues: 5000 });
 
-const getTelegramUser = async (id) => {
+const getTelegramUser = async id => {
   try {
     const cached = userCache.get(id);
-    if (cached) {
-      console.log('cached', id)
-      return cached;
-    }
+    if (cached) return cached;
     const chat = await bot.telegram.getChat(id);
-    console.log('loaded', id, chat)
     if (chat) userCache.set(id, chat, { ttl: 7 * DAYS });
     return chat;
   } catch (err) {
@@ -20,21 +16,20 @@ const getTelegramUser = async (id) => {
   }
 };
 
-const formatUser = (user) => {
+const formatUser = user => {
   return user.username ? user.username : [user.first_name, user.last_name].join(" ");
 };
 
 const transformUserIdsToUserObjects = async (list, getter) => {
-  getter ??= (_) => _.userId;
+  getter ??= _ => _.userId;
   if (!Array.isArray(list)) throw new Error("Array expected here");
   let promises = [];
-  if (list.every((_) => typeof _ === "number" || typeof _ === "string"))
+  if (list.every(_ => typeof _ === "number" || typeof _ === "string"))
     promises = list.map(getTelegramUser);
-  else if (list.every((_) => typeof _ === "object"))
-    promises = list.map(async (obj) => {
+  else if (list.every(_ => typeof _ === "object"))
+    promises = list.map(async obj => {
       const userId = getter(obj);
       obj.user = await getTelegramUser(userId);
-      console.log("GETTING USER", userId, obj.user);
       return obj;
     });
 
