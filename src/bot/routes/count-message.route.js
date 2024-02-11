@@ -1,4 +1,4 @@
-const { db } = require("../../db/db");
+const { db } = require("../../db");
 const { getNow, toTimestamp } = require("../../utils/utils");
 const { bot } = require("../bot");
 

@@ -42,6 +42,7 @@ jobs:
               -d \
               -e NODE_ENV=production \
               -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
+              -e GPT_KEY=${{ secrets.GPT_KEY }} \
               --name ${{ vars.CONTAINER_NAME }} \
               -v ~/data/chatstats/:/app/data/ \
               --restart always \

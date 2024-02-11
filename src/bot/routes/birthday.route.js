@@ -1,7 +1,11 @@
 const { config } = require("../../config");
-const { db } = require("../../db/db");
+const { db } = require("../../db");
 const { bot } = require("../bot");
 const dayjs = require("dayjs");
+const {
+  transformUserIdsToUserObjects,
+  formatUser
+} = require("../../utils/telegram-utils");
 
 const monthsMap = {
   января: 0,
@@ -21,7 +25,7 @@ const monthsMap = {
 const months = Object.keys(monthsMap);
 const rex = new RegExp(`([\\d]+)\\s+(${months.join("|")})`, "i");
 
-const statement = db.prepare(
+const saveStatement = db.prepare(
   `INSERT INTO Birthdays (chatId, userId, date) 
     VALUES (:chatId, :userId, :date)
     ON CONFLICT(userId, chatId) DO UPDATE SET
@@ -41,7 +45,24 @@ bot.command("dr", async ctx => {
   const date = dayjs(`${month}-${day} 12:00`, "M-D HH:mm").tz(config.timezone);
   const dbDate = date.format("MM-DD");
   if (!date.isValid()) return await ctx.reply(INVALID_FORMAT_MSG);
-  statement.run({ chatId, userId, date: dbDate });
+  saveStatement.run({ chatId, userId, date: dbDate });
   await ctx.reply(`День рождения сохранен: ${date.format("DD MMMM")}`);
   console.log("set birthday", { chatId, userId, date: dbDate });
+});
+
+const getStatement = db.prepare(`
+  SELECT * FROM Birthdays WHERE chatId=?
+`);
+
+bot.command("drs", async ctx => {
+  let list = await transformUserIdsToUserObjects(getStatement.all(ctx.chat.id));
+  if (list.length === 0) return await ctx.reply("Нет сохраненных дней рождения");
+  list.forEach(_ => (_.date = dayjs(_.date, "MM-DD")));
+  list = list.sort((a, b) => (a.date.isAfter(b.date) ? 1 : -1));
+  list.forEach(_ => (_.date = _.date.format("DD MMMM")));
+  const msg = [
+    "Дни рождения: ",
+    ...list.map(_ => `${formatUser(_.user)}: ${_.date}`)
+  ].join("\n");
+  await ctx.reply(msg);
 });

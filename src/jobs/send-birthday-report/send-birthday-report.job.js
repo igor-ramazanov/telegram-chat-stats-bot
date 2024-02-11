@@ -5,7 +5,7 @@ const {
   transformUserIdsToUserObjects
 } = require("../../utils/telegram-utils");
 const { config } = require("../../config");
-const { db } = require("../../db/db");
+const { db } = require("../../db");
 const fs = require("fs");
 const { getNow } = require("../../utils/utils");
 const { bot } = require("../../bot/bot");

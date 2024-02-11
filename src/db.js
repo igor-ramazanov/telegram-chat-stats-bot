@@ -1,6 +1,6 @@
 const driver = require("better-sqlite3");
 const { readFileSync } = require("fs");
-const { config } = require("../config");
+const { config } = require("./config");
 const fs = require("fs");
 const path = require("path");
 
