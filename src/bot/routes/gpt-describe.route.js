@@ -32,9 +32,9 @@ bot.on("message", async (ctx, next) => {
   next();
 });
 
-bot.command("describe", async ctx => {
-  if (!isGptAvailable()) return;
-  if (!config.gpt.allowedChats.includes(ctx.chat.id)) return;
+bot.command("describe", async (ctx, next) => {
+  if (!isGptAvailable()) return next();
+  if (!config.gpt.allowedChats.includes(ctx.chat.id)) return next();
   const hist = history[ctx.chat.id];
   if (!hist || hist.length === 0) return await ctx.reply("Нет истории");
   const h =
@@ -42,5 +42,6 @@ bot.command("describe", async ctx => {
   const question = h + hist.map(_ => `${_.username}: ${_.message}\n`).join("\n");
   const response = await askGpt(question);
   if (!response.text) return;
-  await ctx.reply(response.text);
+  await ctx.reply("Чем живет чат в последнее время: \n" + response.text);
+  next();
 });

@@ -26,7 +26,10 @@ const getStatement = db.prepare(
 
 bot.command("titles", (ctx, next) => {
   const data = getStatement.all(ctx.chat.id);
-  if (data.length === 0) return ctx.reply("Название чата не менялось");
+  if (data.length === 0) {
+    ctx.reply("Название чата не менялось");
+    return next();
+  }
   const msg = ['История названий чата:']
   msg.push(...data.map(_ => `${_.timestamp} ${_.title}`))
   ctx.reply(msg.join("\n"))
