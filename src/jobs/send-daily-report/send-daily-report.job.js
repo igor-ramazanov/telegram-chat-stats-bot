@@ -35,7 +35,7 @@ const sendSingleReport = async (
 ) => {
   if (totalMessages <= 0) return;
   try {
-    const header = getHeader(totalMessages, messagesAvg, date.weekday());
+    const header = getHeader(totalMessages, messagesAvg, date.get("day"));
     const users = await transformUserIdsToUserObjects(userMessages);
     users.forEach(_ => (_.username = formatUser(_.user)));
     const list = users.map(o => `${o.username}: ${o.messageCount}`).join("\n");
@@ -52,7 +52,6 @@ const sendSingleReport = async (
 };
 
 bot.command("test", ctx => {
-  console.log("daily");
   sendDailyReport();
 });
 
