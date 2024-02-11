@@ -7,9 +7,13 @@ const userCache = cache({ maxValues: 5000 });
 const getTelegramUser = async (id) => {
   try {
     const cached = userCache.get(id);
-    if (cached) return cached;
+    if (cached) {
+      console.log('cached', id)
+      return cached;
+    }
     const chat = await bot.telegram.getChat(id);
-    userCache.set(id, chat, { ttl: 7 * DAYS });
+    console.log('loaded', id, chat)
+    if (chat) userCache.set(id, chat, { ttl: 7 * DAYS });
     return chat;
   } catch (err) {
     return null;
@@ -30,6 +34,7 @@ const transformUserIdsToUserObjects = async (list, getter) => {
     promises = list.map(async (obj) => {
       const userId = getter(obj);
       obj.user = await getTelegramUser(userId);
+      console.log("GETTING USER", userId, obj.user);
       return obj;
     });
 
