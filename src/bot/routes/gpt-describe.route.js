@@ -16,6 +16,7 @@ const ignoreWhen = [
 bot.on("message", async (ctx, next) => {
   if (!config.gpt.allowedChats.includes(ctx.chat.id)) return next();
   if (ctx.message.from.is_bot) return next();
+  if (!ctx.message.text) return next();
   if (ctx.message.text?.startsWith("/")) return next();
   if (ignoreWhen.some(_ => _ in ctx.message)) return next();
   const chatId = ctx.chat.id;
