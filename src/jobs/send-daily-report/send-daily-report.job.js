@@ -1,49 +1,59 @@
 const { bot } = require("../../bot/bot");
 const scheduler = require("../../utils/scheduler");
 const { transformUserIdsToUserObjects } = require("../../utils/telegram-utils");
-const { getYesterdayTimestamp } = require("../../utils/utils");
+const { getYesterdayTimestamp, getNow, toTimestamp } = require("../../utils/utils");
 const dayjs = require("dayjs");
 const { config } = require("../../config");
 const { formatUser } = require("../../utils/telegram-utils");
-const { getHeader, getReport } = require("./helpers");
-const { getBirthdaysText } = require("./helpers");
+const {
+  getHeader,
+  getTotalMessagesBetweenTimestamps,
+  getAvgMessagesOnWeekday,
+  getUserMessagesBetweenTimestamps
+} = require("./helpers");
 
-const sendDailyReport = async (date) => {
-  date ??= getYesterdayTimestamp();
-  const result = getReport(date);
-  const promises = result.map(sendSingleReport);
+const sendDailyReport = async date => {
+  date = date ?? getNow().subtract(1, "day"); // yesterday by default
+  const ts0 = toTimestamp(date.startOf("day"));
+  const ts1 = toTimestamp(date.endOf("day"));
+  const weekDay = date.get("day");
+  const totals = getTotalMessagesBetweenTimestamps(ts0, ts1);
+  const avgs = getAvgMessagesOnWeekday(weekDay);
+  const grouped = totals.map(obj => {
+    const avg = avgs.find(_ => _.chatId === obj.chatId);
+    obj.messagesAvg = avg?.messagesAvg || 0;
+    obj.userMessages = getUserMessagesBetweenTimestamps(ts0, ts1, obj.chatId);
+    return obj;
+  });
+  const promises = grouped.map(_ => sendSingleReport(date, _));
   await Promise.allSettled(promises);
-  console.log(`sent ${promises.length} daily reports`);
 };
 
-const sendSingleReport = async ({ chatId, userMessages, totalMessages, messagesAvg }) => {
+const sendSingleReport = async (
+  date,
+  { chatId, userMessages, totalMessages, messagesAvg }
+) => {
   if (totalMessages <= 0) return;
   try {
-    userMessages = JSON.parse(userMessages);
-    const header = getHeader(
-      totalMessages,
-      messagesAvg,
-      dayjs.utc().tz(config.timezone).get("day") - 1,
-    );
-    const birthdays = await getBirthdaysText(
-      chatId,
-      userMessages.map((_) => _.userId),
-    );
+    const header = getHeader(totalMessages, messagesAvg, date.weekday());
     const users = await transformUserIdsToUserObjects(userMessages);
-    users.forEach((_) => (_.username = formatUser(_.user)));
-    const list = users.map((o) => `${o.username}: ${o.messageCount}`).join("\n");
-    const message = [header, "", list, "", birthdays].join("\n");
+    users.forEach(_ => (_.username = formatUser(_.user)));
+    const list = users.map(o => `${o.username}: ${o.messageCount}`).join("\n");
+    const message = [header, "", list].join("\n");
     await bot.telegram.sendMessage(chatId, message);
-    console.log(`sent daily report`, { chatId, userMessages, totalMessages });
+    console.log(`sent daily report`, { chatId, totalMessages });
   } catch (err) {
     console.error(
       "error when sending report",
-      { chatId, userMessages, totalMessages, messagesAvg },
-      err,
+      { chatId, totalMessages, messagesAvg },
+      err
     );
   }
 };
 
-scheduler.everyDay(sendDailyReport);
+bot.command("test", ctx => {
+  console.log("daily");
+  sendDailyReport();
+});
 
-module.exports = { sendDailyReport };
+scheduler.everyDay(sendDailyReport);

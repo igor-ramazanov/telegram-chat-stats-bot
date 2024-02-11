@@ -7,7 +7,8 @@
     "dev": "nodemon --no-deprecation --ignore stats .",
     "start": "node --no-deprecation .",
     "docker:build": "docker image build . -t flerokoo/telegram-chat-stats-bot",
-    "docker:push": "docker push flerokoo/telegram-chat-stats-bot"
+    "docker:push": "docker push flerokoo/telegram-chat-stats-bot",
+    "fetch-old-data": "scp -r emile@droplet:~/data/rudebot/ stats/"
   },
   "keywords": [],
   "author": {

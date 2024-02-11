@@ -1,11 +1,13 @@
 const path = require("path");
 const fs = require("fs");
 const dayjs = require("dayjs");
+const { config } = require("../config");
 const isProduction = () => process.env.NODE_ENV === "production";
 
-const getTodayTimestamp = () => dayjs.utc().startOf("day").unix();
+/** @returns {dayjs.Dayjs} */
+const getNow = () => dayjs().utc().tz(config.timezone);
 
-const getYesterdayTimestamp = () => dayjs.utc().startOf("day").subtract(1, "day").unix();
+const toTimestamp = (d) => d.format("YYYY-MM-DD HH:mm");
 
 const loadAll = (rootPath) => {
   return fs
@@ -27,18 +29,7 @@ const loadAllRecursive = (rootPath, predicate) => {
       return file;
     });
 };
-
-const toDateString = (date, noYear = false) => {
-  const m = (date.getMonth() + 1).toString().padStart(2, "0");
-  const y = date.getFullYear().toString();
-  const d = date.getDate().toString().padStart(2, 0);
-  return noYear ? `${d}/${m}` : `${d}/${m}/${y}`;
-};
-
-const fromDateString = (dateStr) => {
-  throw new Error("implement later");
-};
-
+// convert from milliseconds
 const SEC = 0.001;
 const MIN = SEC / 60;
 const HOURS = MIN / 60;
@@ -46,13 +37,11 @@ const DAYS = HOURS / 24;
 const WEEKS = DAYS / 7;
 
 module.exports = {
+  toTimestamp,
+  getNow,
   isProduction,
-  getTodayTimestamp,
-  getYesterdayTimestamp,
   loadAll,
   loadAllRecursive,
-  toDateString,
-  fromDateString,
   SEC,
   MIN,
   HOURS,

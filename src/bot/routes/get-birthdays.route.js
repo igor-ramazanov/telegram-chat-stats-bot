@@ -1,3 +1,4 @@
+const dayjs = require("dayjs");
 const { db } = require("../../db/db");
 const {
   transformUserIdsToUserObjects,
@@ -10,10 +11,10 @@ const statement = db.prepare(`
 `);
 
 bot.command("drs", async (ctx) => {
-  const list = await transformUserIdsToUserObjects(
-    statement.all(ctx.chat.id),
-    (_) => _.userId,
-  );
+  let list = await transformUserIdsToUserObjects(statement.all(ctx.chat.id));
+  list.forEach((_) => (_.date = dayjs(_.date, "MM-DD")));
+  list = list.sort((a, b) => (a.date.isAfter(b.date) ? 1 : -1));
+  list.forEach((_) => (_.date = _.date.format("DD MMMM")));
   const msg = [
     "Дни рождения: ",
     ...list.map((_) => `${formatUser(_.user)}: ${_.date}`),

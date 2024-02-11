@@ -3,9 +3,15 @@ const { loadAll, loadAllRecursive } = require("./utils/utils");
 const dayjs = require("dayjs");
 dayjs.extend(require("dayjs/plugin/utc"));
 dayjs.extend(require("dayjs/plugin/timezone"));
+dayjs.extend(require("dayjs/plugin/duration"));
+dayjs.extend(require("dayjs/plugin/isToday"));
+dayjs.extend(require("dayjs/plugin/isYesterday"));
+dayjs.extend(require("dayjs/plugin/isTomorrow"));
+dayjs.extend(require("dayjs/plugin/weekday"));
 const scheduler = require("./utils/scheduler");
 const path = require("path");
 const { config } = require("./config");
+const { getTelegramUser } = require("./utils/telegram-utils");
 require("dotenv").config();
 
 const loadJobs = () => {

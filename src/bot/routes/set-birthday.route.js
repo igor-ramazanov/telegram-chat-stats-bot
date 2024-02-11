@@ -1,7 +1,5 @@
 const { config } = require("../../config");
 const { db } = require("../../db/db");
-const { sendDailyReport } = require("../../jobs/send-daily-report/send-daily-report.job");
-const { toDateString, getYesterdayTimestamp, getTodayTimestamp } = require("../../utils/utils");
 const { bot } = require("../bot");
 const dayjs = require("dayjs");
 
@@ -15,9 +13,9 @@ const monthsMap = {
   июля: 6,
   августа: 7,
   сентября: 8,
-  октября: 9, 
+  октября: 9,
   ноября: 10,
-  декабря: 11,
+  декабря: 11
 };
 
 const months = Object.keys(monthsMap);
@@ -28,25 +26,22 @@ const statement = db.prepare(
     VALUES (:chatId, :userId, :date)
     ON CONFLICT(userId, chatId) DO UPDATE SET
     date=:date
-    WHERE userId=:userId AND chatId=:chatId
-`);
+    WHERE userId=:userId AND chatId=:chatId`
+);
 
-bot.command("dr", async (ctx) => {
+const INVALID_FORMAT_MSG = "Неправильный формат дршки";
+
+bot.command("dr", async ctx => {
   const chatId = ctx.chat.id;
   const userId = ctx.message.from.id;
   const match = ctx.message.text.match(rex);
-  if (!match) {
-    ctx.reply("Неправильный формат дршки");
-    return;
-  }
-  const month = monthsMap[match[2]];
+  if (!match) return await ctx.reply(INVALID_FORMAT_MSG);
+  const month = monthsMap[match[2]] + 1;
   const day = parseInt(match[1]);
-  const date = dayjs.utc().tz(config.timezone).set("month", month).set("date", day).format("DD/MM");
-  statement.run({ chatId, userId, date });
-  await ctx.reply(`День рождения сохранен: ${date}`);
-  console.log("set birthday", { chatId, userId, date });
-});
-
-bot.command("test", async (ctx) => {
-  sendDailyReport(getTodayTimestamp());
+  const date = dayjs(`${month}-${day} 12:00`, "M-D HH:mm").tz(config.timezone);
+  const dbDate = date.format("MM-DD");
+  if (!date.isValid()) return await ctx.reply(INVALID_FORMAT_MSG);
+  statement.run({ chatId, userId, date: dbDate });
+  await ctx.reply(`День рождения сохранен: ${date.format("DD MMMM")}`);
+  console.log("set birthday", { chatId, userId, date: dbDate });
 });

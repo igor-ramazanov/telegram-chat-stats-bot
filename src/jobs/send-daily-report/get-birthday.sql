@@ -1,1 +1,0 @@
-SELECT * FROM Birthdays WHERE date=? AND userId=? AND chatId=?
