@@ -9,7 +9,6 @@ if (process.env.GPT_KEY) {
       apiKey: process.env.GPT_KEY,
       completionParams: config.gpt.completionParams
     });
-    _api.sendMessage;
     _hasGpt = true;
     console.log('initialized gpt')
   })();
