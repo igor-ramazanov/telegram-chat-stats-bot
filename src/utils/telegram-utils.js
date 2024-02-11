@@ -4,12 +4,14 @@ const { DAYS } = require("./utils");
 
 const userCache = cache({ maxValues: 5000 });
 
+const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days in milliseconds
+
 const getTelegramUser = async id => {
   try {
     const cached = userCache.get(id);
     if (cached) return cached;
     const chat = await bot.telegram.getChat(id);
-    if (chat) userCache.set(id, chat, { ttl: 7 * DAYS });
+    if (chat) userCache.set(id, chat, { ttl: TTL });
     return chat;
   } catch (err) {
     return null;

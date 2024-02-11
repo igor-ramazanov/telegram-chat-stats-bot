@@ -1,31 +1,43 @@
-const cache = ({ maxValues = 1000 } = {}) => {
-  let idx0 = 0;
-  let idx1 = 0;
-  let store = {};
-  let keys = {};
-  return {
-    set(key, value, { ttl = 1e10 } = {}) {
-      const expire = Date.now() + ttl;
-      const exists = Boolean(store[key]);
-      const entry = { value, expire, idx: idx1 };
-      store[key] = entry;
-      if (!exists) keys[idx1++] = key;
-      if (idx1 - idx0 > maxValues) {
-        for (let i = idx0; i < idx1 - maxValues; i++) {
-          delete store[keys[i]];
-          delete keys[i];
+const cache = ({ maxValues = 1000, checkInterval = -1 } = {}) => {
+  const store = new Map();
+
+  if (checkInterval > 0) {
+    setInterval(() => {
+      const now = Date.now();
+      for (const [key, { expire }] of store.entries()) {
+        if (expire < now) {
+          store.delete(key);
         }
-        idx0 = idx1 - maxValues;
       }
+    }, checkInterval);
+  }
+
+  return {
+    set(key, value, { ttl = Infinity } = {}) {
+      if (store.size >= maxValues) {
+        const oldestKey = store.keys().next().value;
+        store.delete(oldestKey);
+      }
+      const expire = Date.now() + ttl;
+      store.set(key, { value, expire });
     },
+
     get(key) {
-      if (store[key]?.expire < Date.now()) {
-        delete store[key];
+      const entry = store.get(key);
+      if (entry && entry.expire < Date.now()) {
+        store.delete(key);
+        return null;
       }
-      return key in store ? store[key].value : null;
+      return entry ? entry.value : null;
     },
+
     has(key) {
-      return Boolean(store[key]);
+      const entry = store.get(key);
+      if (entry && entry.expire >= Date.now()) {
+        return true;
+      }
+      store.delete(key);
+      return false;
     }
   };
 };

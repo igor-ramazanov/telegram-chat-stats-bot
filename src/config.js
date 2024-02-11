@@ -7,6 +7,7 @@ exports.config = {
     allowedChats: [-1001278382802, -1001799649218],
     historyLength: 200,
     completionParams: {
+      // https://platform.openai.com/docs/api-reference/chat/create
       model: "gpt-3.5-turbo-0125",
       temperature: 1,
       top_p: 1 

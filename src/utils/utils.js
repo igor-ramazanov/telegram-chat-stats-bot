@@ -29,22 +29,12 @@ const loadAllRecursive = (rootPath, predicate) => {
       return file;
     });
 };
-// convert from milliseconds
-const SEC = 0.001;
-const MIN = SEC / 60;
-const HOURS = MIN / 60;
-const DAYS = HOURS / 24;
-const WEEKS = DAYS / 7;
+
 
 module.exports = {
   toTimestamp,
   getNow,
   isProduction,
   loadAll,
-  loadAllRecursive,
-  SEC,
-  MIN,
-  HOURS,
-  DAYS,
-  WEEKS,
+  loadAllRecursive
 };
