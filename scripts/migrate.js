@@ -54,7 +54,6 @@ const isJson = path => path.endsWith(".json");
 const parseDate = t => {
   const m = t.match(/([\d]+)-([\d]+)-([\d]+)/);
   if (!m) return null;
-  console.log(m)
   const res = dayjs
     .utc()
     .set("year", parseInt(m[3]))
