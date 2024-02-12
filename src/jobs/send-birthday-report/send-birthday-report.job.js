@@ -27,7 +27,7 @@ const getBirthdaysText = async chatId => {
   const year = dayjs().get("year");
   let bds = getBdayStatement.all(chatId);
   bds = await transformUserIdsToUserObjects(bds);
-  bds.forEach(_ => (_.date = dayjs(`${year}-${_.date}`, "YYYY-MM-DD")));
+  bds.forEach(_ => (_.date = dayjs(`${year}-${_.date} 12:00`, "YYYY-MM-DD HH:mm")));
   bds.forEach(_ => (_.username = formatUser(_.user)));
   const bdsToday = bds.filter(_ => _.date.isToday());
   if (bdsToday.length > 0) {
