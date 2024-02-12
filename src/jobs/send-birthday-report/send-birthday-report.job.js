@@ -32,7 +32,7 @@ const getBirthdaysText = async chatId => {
   const bdsToday = bds.filter(
     _ => _.date.date() === getNow().date() && _.date.month() === getNow().month()
   );
-  console.log(bds);
+  console.log(getNow(), bds);
   if (bdsToday.length > 0) {
     message.push(getEmojis());
     message.push(
