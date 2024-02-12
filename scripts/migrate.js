@@ -60,7 +60,7 @@ const parseDate = t => {
     .set("month", parseInt(m[2]) - 1)
     .set("date", parseInt(m[1]))
     .set("hour", 12)
-    .set('minute', 0)
+    .set("minute", 0);
   return res;
 };
 
@@ -85,18 +85,17 @@ const migrate = (rootPath = "stats") => {
   }
 };
 
+const insertManyT = db.transaction(data => {
+  let st = db.prepare(`INSERT INTO Messages (timestamp, chatId, userId) VALUES 
+    (:timestamp, :chatId, :userId)`);
+  for (let i of data) st.run(i);
+});
 
 const insertMany = (chatId, userId, timestamp, n) => {
-  let q = 'INSERT INTO Messages (timestamp, chatId, userId) VALUES ';
-  let qq = `(${[`'` + timestamp + `'`, chatId, userId].join(", ")})`;
-  let qqq = [];
-  for(let i = 0; i < n;i++) {
-    qqq.push(qq);
-  }
-  q += qqq.join(", ");
-  console.log(q);
-  db.exec(q);
-}
+  let res = [];
+  for(let i = 0; i < n; i++) res.push({chatId, userId, timestamp});
+  insertManyT(res);
+};
 
 const migrateFile = (data, date) => {
   const formattedDate = toTimestamp(date);
@@ -108,11 +107,11 @@ const migrateFile = (data, date) => {
     for (let username of Object.keys(data[chatId])) {
       if (!knownIds[username]) continue;
       console.log("messages for user: ", username, data[chatId][username]);
-      insertMany(chatId, knownIds[username], formattedDate, data[chatId][username])
+      insertMany(chatId, knownIds[username], formattedDate, data[chatId][username]);
       messages -= data[chatId][username];
     }
     console.log("other messages", messages);
-    insertMany(chatId, FAKE_USER_ID, formattedDate, messages)
+    insertMany(chatId, FAKE_USER_ID, formattedDate, messages);
   }
 };
 
