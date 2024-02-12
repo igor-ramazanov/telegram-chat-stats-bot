@@ -49,7 +49,7 @@ const getBirthdaysText = async chatId => {
       !bdsToday.includes(_)
   );
   if (bdsSoon.length > 0) {
-    message.push("🗓 Ближайшие дни рождения: ");
+    message.push("\n🗓 Ближайшие дни рождения: ");
     message.push(...bdsSoon.map(_ => _.username + ": " + _.date.format("DD/MM")));
   }
   return message.length > 0 ? message.join("\n").trim() : "";
