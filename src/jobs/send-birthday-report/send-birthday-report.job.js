@@ -29,7 +29,9 @@ const getBirthdaysText = async chatId => {
   bds = await transformUserIdsToUserObjects(bds);
   bds.forEach(_ => (_.date = dayjs(`${year}-${_.date} 12:00`, "YYYY-MM-DD HH:mm")));
   bds.forEach(_ => (_.username = formatUser(_.user)));
-  const bdsToday = bds.filter(_ => _.date.isToday());
+  const bdsToday = bds.filter(
+    _ => _.date.date() === getNow().date() && _.date.month() === getNow().month()
+  );
   console.log(bds);
   if (bdsToday.length > 0) {
     message.push(getEmojis());
@@ -70,4 +72,3 @@ everyDay(sendBirthdayReport);
 bot.command("test", ctx => {
   sendBirthdayReport();
 });
-
