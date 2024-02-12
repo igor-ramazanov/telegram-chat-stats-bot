@@ -38,10 +38,13 @@ bot.command("describe", async (ctx, next) => {
   const hist = history[ctx.chat.id];
   if (!hist || hist.length === 0) return await ctx.reply("Нет истории");
   const h =
-    "Это история переписки в чате. Сделай краткую выжимку из этой переписки: какие темы кем обсуждались.\n\n";
+    `Это история переписки в чате. Сделай краткую выжимку из этой переписки:
+    какие темы кем обсуждались. Будь конкретен, избегай абстрактных слов.
+    Обязательно опиши ход беседы, какие кем были приведены аргументы,
+    к какому выводу в итоге пришли. Конкретно!\n\n`;
   const question = h + hist.map(_ => `${_.username}: ${_.message}\n`).join("\n");
   const response = await askGpt(question);
   if (!response.text) return;
-  await ctx.reply("Чем живет чат в последнее время: \n" + response.text);
+  await ctx.reply(response.text);
   next();
 });
