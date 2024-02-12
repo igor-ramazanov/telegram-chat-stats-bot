@@ -30,6 +30,7 @@ const getBirthdaysText = async chatId => {
   bds.forEach(_ => (_.date = dayjs(`${year}-${_.date} 12:00`, "YYYY-MM-DD HH:mm")));
   bds.forEach(_ => (_.username = formatUser(_.user)));
   const bdsToday = bds.filter(_ => _.date.isToday());
+  console.log(bds);
   if (bdsToday.length > 0) {
     message.push(getEmojis());
     message.push(
