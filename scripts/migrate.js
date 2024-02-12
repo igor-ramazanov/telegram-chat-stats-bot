@@ -88,13 +88,13 @@ const migrate = (rootPath = "stats") => {
 
 const insertMany = (chatId, userId, timestamp, n) => {
   let q = 'INSERT INTO Messages (timestamp, chatId, userId) VALUES ';
-  let qq = `(${[timestamp, chatId, userId].join(", ")})`;
+  let qq = `(${[`'` + timestamp + `'`, chatId, userId].join(", ")})`;
   let qqq = [];
   for(let i = 0; i < n;i++) {
     qqq.push(qq);
   }
   q += qqq.join(", ");
-  // console.log(q);
+  console.log(q);
   db.exec(q);
 }
 
