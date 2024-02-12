@@ -26,7 +26,7 @@ const isGptAvailable = () => {
 
 const askGpt = async (
   question,
-  { model = config.gpt.completionParams.model, system, completionParams } = {}
+  { model = config.gpt.completionParams.model, system, completionParams, onError } = {}
 ) => {
   const messages = composeMessages(question, system);
   try {
@@ -40,6 +40,7 @@ const askGpt = async (
     return comp.choices[0].message.content;
   } catch (err) {
     console.error("gpt error", err);
+    onError?.();
     return null;
   }
 };
@@ -51,7 +52,8 @@ const askGptStream = async (
     model = config.gpt.completionParams.model,
     updateInterval = 0,
     completionParams,
-    system
+    system,
+    onError
   } = {}
 ) => {
   const messages = composeMessages(question, system);
@@ -79,6 +81,7 @@ const askGptStream = async (
     return response;
   } catch (err) {
     console.error("gpt stream error", err);
+    onError?.();
     return null;
   }
 };

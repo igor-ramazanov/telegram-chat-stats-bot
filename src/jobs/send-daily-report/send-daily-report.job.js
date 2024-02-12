@@ -38,6 +38,7 @@ const sendSingleReport = async (
     const header = getHeader(totalMessages, messagesAvg, date.get("day"));
     const users = await transformUserIdsToUserObjects(userMessages);
     users.forEach(_ => (_.username = formatUser(_.user)));
+    users.sort((a, b) => b.messageCount - a.messageCount);
     const list = users.map(o => `${o.username}: ${o.messageCount}`).join("\n");
     const message = [header, "", list].join("\n");
     await bot.telegram.sendMessage(chatId, message);
@@ -51,8 +52,6 @@ const sendSingleReport = async (
   }
 };
 
-bot.command("test", ctx => {
-  sendDailyReport();
-});
+
 
 scheduler.everyDay(sendDailyReport);

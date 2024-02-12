@@ -50,8 +50,7 @@ const getBirthdaysText = async chatId => {
   return message.length > 0 ? message.join("\n").trim() : "";
 };
 
-const sendBirthdayReport = async date => {
-  date = date ?? getNow(); // today by default
+const sendBirthdayReport = async () => {
   const chats = getChatsStatement.all().map(_ => _.chatId);
   for (let chatId of chats) {
     try {
@@ -66,4 +65,8 @@ const sendBirthdayReport = async date => {
 };
 
 everyDay(sendBirthdayReport);
+
+bot.command("test", ctx => {
+  sendBirthdayReport();
+});
 
