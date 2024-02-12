@@ -43,8 +43,10 @@ const getBirthdaysText = async chatId => {
     );
   }
   const bdsSoon = bds.filter(
-    ({ date }) =>
-      date.diff(getNow(), "day") <= config.birthdayRemindDays && date.isAfter(getNow())
+    _ =>
+      _.date.diff(getNow(), "day") <= config.birthdayRemindDays &&
+      _.date.isAfter(getNow()) &&
+      !bdsToday.includes(_)
   );
   if (bdsSoon.length > 0) {
     message.push("🗓 Ближайшие дни рождения: ");
