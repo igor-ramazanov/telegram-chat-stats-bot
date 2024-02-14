@@ -5,7 +5,7 @@ exports.config = {
   gpt: {
     enabled: true,
     allowedChats: [-1001278382802, -1001799649218],
-    historyLength: 500,
+    historyLength: 200,
     completionParams: {
       // https://platform.openai.com/docs/api-reference/chat/create
       model: 'gpt-4',

@@ -24,12 +24,17 @@ const isGptAvailable = () => {
   return _hasGpt && config.gpt.enabled;
 };
 
+const ensureAvailable = () => {
+  if (!isGptAvailable()) throw new Error('Gpt is not available');
+}
+
 const askGpt = async (
   question,
   { model = config.gpt.completionParams.model, system, completionParams, onError } = {}
 ) => {
   const messages = composeMessages(question, system);
   try {
+    ensureAvailable();
     const comp = await _api.chat.completions.create({
       ...config.gpt.completionParams,
       ...completionParams,
@@ -58,6 +63,7 @@ const askGptStream = async (
 ) => {
   const messages = composeMessages(question, system);
   try {
+    ensureAvailable();
     const stream = await _api.chat.completions.create({
       ...config.gpt.completionParams,
       ...completionParams,
@@ -71,7 +77,7 @@ const askGptStream = async (
     for await (let chunk of stream) {
       const delta = chunk.choices[0]?.delta?.content || "";
       response += delta;
-      if (Date.now() - ts > updateInterval) {
+      if (response.length > 0 && Date.now() - ts > updateInterval) {
         await onChunk(response);
         ts = Date.now();
       }

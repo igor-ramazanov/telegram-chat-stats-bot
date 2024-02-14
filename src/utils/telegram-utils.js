@@ -40,4 +40,47 @@ const transformUserIdsToUserObjects = async (list, getter) => {
   return await Promise.all(promises);
 };
 
-module.exports = { getTelegramUser, formatUser, transformUserIdsToUserObjects };
+const isServiceMessage = msg => {
+  const props = [
+    "pinned_message",
+    "new_chat_members",
+    "new_chat_member",
+    "left_chat_memeber"
+  ];
+  return props.some(_ => {
+    if (Array.isArray(msg[_])) return msg[_].length !== 0;
+    return Boolean(msg[_]);
+  });
+};
+
+const isCommandMessage = msg => {
+  return !isEmptyMessage(msg) && msg.text.startsWith("/");
+};
+
+const isEmptyMessage = msg => {
+  return typeof msg.text !== "string" || msg.text.length === 0;
+};
+
+const isBotMessage = msg => {
+  return msg.from.is_bot;
+};
+
+const isRegularMessage = msg => {
+  return (
+    !isBotMessage(msg) &&
+    !isEmptyMessage(msg) &&
+    !isCommandMessage(msg) &&
+    !isServiceMessage(msg)
+  );
+};
+
+module.exports = {
+  getTelegramUser,
+  formatUser,
+  transformUserIdsToUserObjects,
+  isCommandMessage,
+  isServiceMessage,
+  isEmptyMessage,
+  isBotMessage,
+  isRegularMessage
+};
