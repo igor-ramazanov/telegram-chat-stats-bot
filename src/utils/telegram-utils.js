@@ -8,12 +8,18 @@ const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days in milliseconds
 
 const getTelegramUser = async id => {
   try {
+    console.log('getting tg user ', id)
     const cached = userCache.get(id);
-    if (cached) return cached;
+    if (cached) {
+      console.log('from cache', cached)
+      return cached;
+    }
     const chat = await bot.telegram.getChat(id);
     if (chat) userCache.set(id, chat, { ttl: TTL });
+    console.log('from api', chat);
     return chat;
   } catch (err) {
+    console.error('err', id, err)
     return null;
   }
 };
