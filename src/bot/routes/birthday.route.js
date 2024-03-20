@@ -59,7 +59,9 @@ const getStatement = db.prepare(`
 `);
 
 bot.command("drs", async (ctx, next) => {
-  let list = await transformUserIdsToUserObjects(getStatement.all(ctx.chat.id));
+  const dbData = getStatement.all(ctx.chat.id);
+  console.log('db data', JSON.stringify(dbData, 3, null))
+  let list = await transformUserIdsToUserObjects(dbData);
   if (list.length === 0) {
     await ctx.reply("Нет сохраненных дней рождения");
     return next()

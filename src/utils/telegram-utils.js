@@ -19,6 +19,10 @@ const getTelegramUser = async id => {
 };
 
 const formatUser = user => {
+  if (!user) {
+    console.error("Unknown user", user);
+    return "Unknown user";
+  }
   return user.username ? user.username : [user.first_name, user.last_name].join(" ");
 };
 
