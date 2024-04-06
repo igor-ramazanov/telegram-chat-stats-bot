@@ -27,4 +27,12 @@ CREATE TABLE IF NOT EXISTS ChatTitles (
   timestamp     DATETIME NOT NULL,
   title         TEXT NOT NULL,
   PRIMARY KEY(id AUTOINCREMENT)
-)
+);
+
+CREATE TABLE IF NOT EXISTS Users (
+  id            INTEGER NOT NULL UNIQUE,
+  firstName     TEXT,
+  lastName      TEXT,
+  userName      TEXT,
+  PRIMARY KEY(id AUTOINCREMENT)
+);

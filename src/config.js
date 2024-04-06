@@ -13,5 +13,8 @@ exports.config = {
       temperature: 1,
       top_p: 1 
     }
+  },
+  logs: {
+    fullLogPath: 'data/logs/all.log'
   }
 };

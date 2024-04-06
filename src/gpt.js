@@ -1,6 +1,7 @@
 const { config } = require("./config");
 const OpenAI = require("openai");
 const { delay, safe } = require("./utils/utils");
+const { logger } = require("./utils/logger");
 
 /** @type {OpenAI.OpenAI} */
 let _api;
@@ -9,7 +10,7 @@ let _hasGpt = false;
 if (process.env.GPT_KEY) {
   _api = new OpenAI({ apiKey: process.env.GPT_KEY });
   _hasGpt = true;
-  console.log("initialized gpt");
+  logger.info("initialized gpt");
 }
 
 const composeMessages = (question, system) => {
@@ -25,8 +26,8 @@ const isGptAvailable = () => {
 };
 
 const ensureAvailable = () => {
-  if (!isGptAvailable()) throw new Error('Gpt is not available');
-}
+  if (!isGptAvailable()) throw new Error("Gpt is not available");
+};
 
 const askGpt = async (
   question,

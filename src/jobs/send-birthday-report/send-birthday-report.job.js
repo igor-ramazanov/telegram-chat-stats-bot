@@ -11,6 +11,7 @@ const { getNow } = require("../../utils/utils");
 const { bot } = require("../../bot/bot");
 const { everyDay } = require("../../utils/scheduler");
 const { send } = require("process");
+const { logger } = require("../../utils/logger");
 
 const getBdayStatement = db.prepare(`SELECT date, userId FROM Birthdays WHERE chatId=?`);
 const getChatsStatement = db.prepare(`SELECT DISTINCT chatId FROM Birthdays`);
@@ -32,7 +33,6 @@ const getBirthdaysText = async chatId => {
   const bdsToday = bds.filter(
     _ => _.date.date() === getNow().date() && _.date.month() === getNow().month()
   );
-  console.log(getNow(), bds);
   if (bdsToday.length > 0) {
     message.push(getEmojis());
     message.push(
@@ -62,9 +62,9 @@ const sendBirthdayReport = async () => {
       const msg = await getBirthdaysText(chatId);
       if (!msg.length) continue;
       await bot.telegram.sendMessage(chatId, msg);
-      console.log("sent birthday report", { chatId });
+      logger.info({chatId, msg}, 'birthday report sent')
     } catch (err) {
-      console.error("Error when sending birthday report", { chatId }, err);
+      logger.error(err, 'error when sending birthday report');
     }
   }
 };

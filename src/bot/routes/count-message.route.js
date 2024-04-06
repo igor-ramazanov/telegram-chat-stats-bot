@@ -1,4 +1,5 @@
 const { db } = require("../../db");
+const { logger } = require("../../utils/logger");
 const {
   isBotMessage,
   isEmptyMessage,
@@ -19,6 +20,6 @@ bot.on("message", async (ctx, next) => {
   const userId = ctx.message.from.id;
   const timestamp = toTimestamp(getNow());
   statement.run({ timestamp, chatId, userId });
-  console.log("counted message", { chatId, userId, timestamp });
+  logger.log({chatId, userId, timestamp}, 'counted message');
   next();
 });

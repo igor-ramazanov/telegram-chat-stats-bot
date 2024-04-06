@@ -1,5 +1,6 @@
 const { config } = require("../config");
 const dayjs = require("dayjs");
+const { logger } = require("./logger");
 
 const callbacks = {
   second: [],
@@ -7,7 +8,7 @@ const callbacks = {
   hour: [],
   day: [],
   month: [],
-  year: [],
+  year: []
 };
 
 const getState = () => {
@@ -20,7 +21,7 @@ const getState = () => {
 
 let prevState = getState();
 
-const triggerCallbacks = (key) => callbacks[key].forEach((_) => _());
+const triggerCallbacks = key => callbacks[key].forEach(_ => _());
 
 const step = () => {
   let diff = false;
@@ -37,15 +38,15 @@ const step = () => {
 let idx;
 const start = () => {
   idx = setInterval(step, 1000);
-  console.log("scheduler started");
+  logger.info("scheduler started");
 };
 
 const stop = () => {
   clearInterval(idx);
-  console.log("scheduler stopped");
+  logger.info("scheduler stopped");
 };
 
-const getCallbackCreator = (key) => (cb) => {
+const getCallbackCreator = key => cb => {
   callbacks[key].push(cb);
 };
 
@@ -57,7 +58,7 @@ const scheduler = {
   everyMonth: getCallbackCreator("month"),
   everyYear: getCallbackCreator("year"),
   start,
-  stop,
+  stop
 };
 
 module.exports = scheduler;

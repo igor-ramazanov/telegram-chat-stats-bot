@@ -11,6 +11,7 @@ const {
   getAvgMessagesOnWeekday,
   getUserMessagesBetweenTimestamps
 } = require("./helpers");
+const { logger } = require("../../utils/logger");
 
 const sendDailyReport = async date => {
   date = date ?? getNow().subtract(1, "day"); // yesterday by default
@@ -42,13 +43,9 @@ const sendSingleReport = async (
     const list = users.map(o => `${o.username}: ${o.messageCount}`).join("\n");
     const message = [header, "", list].join("\n");
     await bot.telegram.sendMessage(chatId, message);
-    console.log(`sent daily report`, { chatId, totalMessages });
+    logger.info({chatId, totalMessages}, 'sent daily report');
   } catch (err) {
-    console.error(
-      "error when sending report",
-      { chatId, totalMessages, messagesAvg },
-      err
-    );
+    logger.error(err, 'error when sending daily report');
   }
 };
 
