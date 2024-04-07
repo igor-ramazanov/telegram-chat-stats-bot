@@ -10,29 +10,31 @@ const TTL = 1000 * 60 * 60 * 24 * 7; // 7 days in milliseconds
 
 const getTelegramUser = async id => {
   try {
-    const cached = userCache.get(id);
-    if (cached) return cached;
-    let chat = getUserStatement.get(id);
+    let chat = userCache.get(id);
+    chat ??= getUserStatement.get(id);
+    console.log("vot", chat);
     chat ??= await bot.telegram.getChat(id);
     if (chat) userCache.set(id, chat, { ttl: TTL });
     return chat;
   } catch (err) {
-    console.error("err", id, err);
+    logger.error({ id, err }, "can't get telegram user");
     return null;
   }
 };
 
 const formatUser = user => {
   if (!user) {
-    console.error("Unknown user", user);
+    logger.warn(user, "trying to format unknown user");
     return "Unknown user";
   }
-  return user.username ? user.username : [user.first_name, user.last_name].join(" ");
+  return user.username || user.userName
+    ? user.username ?? user.userName
+    : [user.first_name ?? user.firstName, user.last_name ?? user.lastName].join(" ");
 };
 
 const transformUserIdsToUserObjects = async (list, getter) => {
   getter ??= _ => _.userId;
-  if (!Array.isArray(list)) throw new Error("Array expected here");
+  if (!Array.isArray(list)) throw new Error("array expected here");
   let promises = [];
   if (list.every(_ => typeof _ === "number" || typeof _ === "string"))
     promises = list.map(getTelegramUser);
@@ -43,7 +45,7 @@ const transformUserIdsToUserObjects = async (list, getter) => {
       return obj;
     });
 
-  if (!promises) throw new Error("Wrong input", list);
+  if (!promises) throw new Error("wrong input", list);
 
   return await Promise.all(promises);
 };
